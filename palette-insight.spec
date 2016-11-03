@@ -1,6 +1,3 @@
-# %define serviceuser gpadmin
-# %define servicehome /home/gpadmin
-
 #   Disable any prep shell actions. replace them with simply 'true'
 # %define __spec_prep_post true
 # %define __spec_prep_pre true
@@ -25,25 +22,26 @@
 # # Use bzip2 payload compression
 # %define _binary_payload w9.bzdio
 
-
+# Enable bash specific commands (eg. pushd)
+%define _buildshell /bin/bash
 Name: palette-insight
-Version: %version
-Epoch: 0
-Release: %buildrelease
+Version: %{version}
+Release: %{buildrelease}
 Summary: Installer of the Palette Insight product
-AutoReqProv: no
-# Seems specifying BuildRoot is required on older rpmbuild (like on CentOS 5)
-# fpm passes '--define buildroot ...' on the commandline, so just reuse that.
-#BuildRoot: %buildroot
-# Add prefix, must not end with /
-
-Prefix: /
-
 Group: default
 License: Proprietary
 Vendor: Palette Software
 URL: http://www.palette-software.com
 Packager: Palette Developers <developers@palette-software.com>
+BuildArch: noarch
+# Disable Automatic Dependency Processing
+AutoReqProv: no
+# Add prefix, must not end with / except for root (/)
+Prefix: /
+# Seems specifying BuildRoot is required on older rpmbuild (like on CentOS 5)
+# fpm passes '--define buildroot ...' on the commandline, so just reuse that.
+# BuildRoot: %buildroot
+
 
 Requires: palette-insight-toolkit palette-insight-website
 Requires: palette-insight-agent palette-insight-server
@@ -52,12 +50,5 @@ Requires: palette-greenplum-installer palette-insight-gp-import palette-insight-
 %description
 Installer of the Palette Insight product
 
-# %files
-# %defattr(-,gpadmin,gpadmin,-)
-# 
-# /usr/local/greenplum-db
-# %attr(700, -, -) /home/gpadmin
-# %attr(755, root, root) /etc/init.d/greenplum
-
-%changelog
-
+# Empty files otherwise package is not built
+%files
