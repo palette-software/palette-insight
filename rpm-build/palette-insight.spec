@@ -37,5 +37,8 @@ Requires: palette-insight-reporting
 %description
 Installer of the Palette Insight product
 
+%clean
+# noop
+
 # Empty files otherwise package is not built
 %files
