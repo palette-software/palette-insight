@@ -1,5 +1,12 @@
 # Enable bash specific commands (eg. pushd)
 %define _buildshell /bin/bash
+
+# As we are not adding any file to this package, it would attempt to
+# package the contents of the rpm-build directory, and would complain
+# about "installed, but unpackaged" files. Overcome that by disabling
+# the following macro.
+%define _unpackaged_files_terminate_build 0
+
 Name: palette-insight
 Version: %{version}
 Release: %{buildrelease}
@@ -9,7 +16,7 @@ License: Proprietary
 Vendor: Palette Software
 URL: http://www.palette-software.com
 Packager: Palette Developers <developers@palette-software.com>
-BuildArch: noarch
+BuildArch: x86_64
 # Disable Automatic Dependency Processing
 AutoReqProv: no
 # Add prefix, must not end with / except for root (/)

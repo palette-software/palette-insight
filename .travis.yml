@@ -34,6 +34,7 @@ script:
   - cat ${SPEC_FILE}
 
   # build the rpm
+  - mkdir _build
   - rpmbuild -bb --buildroot $(pwd) --define "version $RPM_VERSION" --define "buildrelease $TRAVIS_BUILD_NUMBER" --define "_rpmdir $(pwd)/_build" ${SPEC_FILE}
   - popd
 
