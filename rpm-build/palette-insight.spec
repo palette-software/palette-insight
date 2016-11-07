@@ -18,9 +18,12 @@ Prefix: /
 # fpm passes '--define buildroot ...' on the commandline, so just reuse that.
 # BuildRoot: %buildroot
 
-
-Requires: palette-insight-toolkit palette-insight-website
-Requires: palette-insight-agent palette-insight-server
+# Travis is going to freeze the versions of these requirements by adding
+# a specific version to the end of each line
+Requires: palette-insight-toolkit
+Requires: palette-insight-website
+Requires: palette-insight-agent
+Requires: palette-insight-server
 Requires: palette-insight-gp-import
 Requires: palette-insight-reporting
 
