@@ -22,16 +22,16 @@ addons:
 
 script:
   - pushd rpm-build
-  # Freeze the dependencies of requirements
-  - export SPEC_FILE=palette-insight.spec
-  - ./freeze-requirement.sh palette-insight-toolkit ${SPEC_FILE}
-  - ./freeze-requirement.sh palette-insight-website ${SPEC_FILE}
-  - ./freeze-requirement.sh palette-insight-agent ${SPEC_FILE}
-  - ./freeze-requirement.sh palette-insight-server ${SPEC_FILE}
-  - ./freeze-requirement.sh palette-insight-gp-import ${SPEC_FILE}
-  - ./freeze-requirement.sh palette-insight-reporting ${SPEC_FILE}
-  # Show the contents of the modified (frozen versions) spec file
-  - cat ${SPEC_FILE}
+  # # Freeze the dependencies of requirements
+  # - export SPEC_FILE=palette-insight.spec
+  # - ./freeze-requirement.sh palette-insight-toolkit ${SPEC_FILE}
+  # - ./freeze-requirement.sh palette-insight-website ${SPEC_FILE}
+  # - ./freeze-requirement.sh palette-insight-agent ${SPEC_FILE}
+  # - ./freeze-requirement.sh palette-insight-server ${SPEC_FILE}
+  # - ./freeze-requirement.sh palette-insight-gp-import ${SPEC_FILE}
+  # - ./freeze-requirement.sh palette-insight-reporting ${SPEC_FILE}
+  # # Show the contents of the modified (frozen versions) spec file
+  # - cat ${SPEC_FILE}
 
   # build the rpm
   - mkdir _build
