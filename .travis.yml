@@ -23,7 +23,7 @@ addons:
 script:
   - pushd rpm-build
   # # Freeze the dependencies of requirements
-  # - export SPEC_FILE=palette-insight.spec
+  - export SPEC_FILE=palette-insight.spec
   # - ./freeze-requirement.sh palette-insight-toolkit ${SPEC_FILE}
   # - ./freeze-requirement.sh palette-insight-website ${SPEC_FILE}
   # - ./freeze-requirement.sh palette-insight-agent ${SPEC_FILE}
