@@ -42,3 +42,14 @@ Installer of the Palette Insight product
 
 # Empty files otherwise package is not built
 %files
+
+%post
+# Add custom update scripts here to perform during the update
+
+# This lines are going to be required for a while, because due to a bug in the
+# palette-insight-gp-import package, the insight-gpfdist service gets stopped
+# even during upgrades and not only on uninstall.
+sudo supervisorctl status insight-gpfdist | grep STOPPED
+if [ $? -eq 0 ]; then
+    sudo supervisorctl start insight-gpfdist
+fi
