@@ -2,3 +2,5 @@
 
 # Palette Insight Installer
 One RPM package above all Palette Insight related RPM packages.
+
+This package is supposed to be the last one being installed during updates, so this package's post install steps can be used to perform custom commands during Palette Insight updates.
