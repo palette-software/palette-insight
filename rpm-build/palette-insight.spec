@@ -33,6 +33,7 @@ Requires: palette-insight-agent
 Requires: palette-insight-server
 Requires: palette-insight-gp-import
 Requires: palette-insight-reporting
+Requires: palette-insight-sanity-check
 
 %description
 Installer of the Palette Insight product
