@@ -4,3 +4,7 @@
 One RPM package above all Palette Insight related RPM packages.
 
 This package is supposed to be the last one being installed during updates, so this package's post install steps can be used to perform custom commands during Palette Insight updates.
+
+# Palette Insight Architecture
+
+![GitHub Logo](https://github.com/palette-software/palette-insight/blob/master/insight-system-diagram.png?raw=true)
