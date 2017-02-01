@@ -7,10 +7,10 @@ env:
       - DEPLOY_HOST=rpm.palette-software.com
       - DEPLOY_PATH=/var/palette-rpm-repo
       - DEPLOY_USER=palette-rpm
-      - RPM_VERSION=1.0.$TRAVIS_BUILD_NUMBER
+      - RPM_VERSION=1.1.$TRAVIS_BUILD_NUMBER
 
       # travis encrypt DEPLOY_PASS=...
-      - secure: "RSneIngDU6k3qXxovaLkQGaoswsfjOAR+DWQ9aHqmDSoUsYWmsYnnVfZxAS0rJ76XPKCcf5cbW70XYOozw2rN2geDyg9deQXvWLn2ckd/uOsCxvLvuOmWitmZPLNNblIBaYKX1seL+v8h8cjnlbhb76IEEBrBEoSpbJUN33vCnN13eV7jt4pnhwHOzzqXM8qHNX4K1MuiW5NN/Zk5+qqTscCrc7pvbshP9JaGc8OvxiXFS9yyAauSxSnL1wtJmYSwPh+FSM9NZmr8+PnvEmvP/R6ETGVouS4hpdtWGAveLGcKoOnv+yA1dWUfNT3U24rEPA+qNvGUx2OTqRbUM8cDS/D8uBCjFcXmREgDB899TXIZDaXhBuk4enPMm0W0pNlupnXrx4hTScXx9dslr/yPA7tyldvg+C+f6pe16eo2zK7MJo6x/vKX7EZjX/IGbHWBNBSvpco+jxhdEve0MQl8GY3/v3OSamy+bLyCBgkyPhfC+3KV8TYTsrYQSWUIkuci4xeSu9rorbHv41jE6/Vw5O5aBMjN4vAxw5/XkrmoML4Ppi7f41ho/w7jlJqDOOhk93macgLqSIWuNK50dxkdONsraI1sDT+lgDoUQMy5ONX9zjv7E56qqKoSZRJAJ8PE5rmnChY739ehbM+dFovwDgWyYdSdoEDF3ztXQK1Tlw="
+      - secure: "D5cWds4KxRVSB8GUDOYk1KD5SyQ14uOYV8Ffxr4ob8L4X9kj+G4QZ2nZLJxNK/S60PrR+abJptgN/Kv67VHgDVneaO9KppvxqTteE62jmPgrcifUf+oyAmZSvlWpFJPTQKAn8k1B5kX1JJUPJnJwFYzlTYqwubBbkVKPERcYYWrsnYhdgzAfSxgp74LykZySIPs0CvymzPMWZAnv0GBjrJk2yvYDvNZGayVkAv1g+OyVxMK5eY3qT3Y9Mvo9QmzfC0su8DVzdwncHeNysDrNo8L6LV2IucR/SrZ2diaark1P9OtABQpzWr9MD0cLZvOyg1tXa+YQs9ON+Fa+xEnFjpBpZ7Mc7fsbTDI0hFaPwX0wb7eL/L7fkUK4jE9VSnvXUtE/UlAfS4kZOC6CqWe0KjZhd2HaqJnDdGob/ZzWTS6Q4oUi0Wh6CLljh4lDNyN4HWSi7oLp5O6eMKa7SoGUf3HkRJkODA9+iRgZhRZifLEYNMfH5yA577kQZisHlFqeH6ZksAidplZPdRq5e+lEv1hdpvkFyDo8VnSf4aEua1LTuNTqZP+4pP4wcj9MtmOVJEchyesHhAjvkYpNoCdPDOV/Il6Z2LqJU5dtd6EfY2E0UOKtfiY/GEEK2x6a3LdIP4fl7C6pdwsK9I5ayV+RBUqsF6Sd4tqpaRhUiFNNMo8="
 
 # install the RPM package
 addons:
