@@ -9,7 +9,8 @@ This package is supposed to be the last one being installed during updates, so t
 
 ### Make sure Palette RPM repository is enabled
 
-IUS and EPEL repositories are needed. The proxies for them are only needed when they are not directly available.
+IUS and EPEL repositories are needed. Make sure you install the propriate packages from here:
+https://ius.io/GettingStarted/
 
 ```
 centos@ip-10-47-14-86:~$ sudo vi /etc/yum.repos.d/palette.repo
