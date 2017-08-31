@@ -5,6 +5,16 @@ export PALETTE_REQUIRED_DATA_PARTITION_SIZE=209612596
 
 INSTALL_ROOT_DIR=$(dirname $0)
 
+if [ ! -d ${INSTALL_ROOT_DIR}/rpm ]; then
+    echo "${INSTALL_ROOT_DIR}/rpm does not exist"
+    exit 1
+fi
+
+if [ ! -d ${INSTALL_ROOT_DIR}/pip ]; then
+    echo "${INSTALL_ROOT_DIR}/pip does not exist"
+    exit 1
+fi
+
 pushd ${INSTALL_ROOT_DIR}/rpm
 INSTALL_RPM_DIR=$(pwd)
 popd
@@ -14,7 +24,8 @@ INSTALL_PIP_DIR=$(pwd)
 popd
 
 pushd ${INSTALL_RPM_DIR}
-yum localinstall -y --disablerepo="*" createrepo-0.9.9-26.el6.noarch.rpm python-deltarpm-3.5-0.5.20090913git.el6.x86_64.rpm deltarpm-3.5-0.5.20090913git.el6.x86_64.rpm libxml2-python-2.7.6-21.el6_8.1.x86_64.rpm libxml2-2.7.6-21.el6_8.1.x86_64.rpm
+CREATEREPO_PACKAGES="createrepo-0.9.9-28.el7.noarch.rpm deltarpm-3.6-3.el7.x86_64.rpm python-deltarpm-3.6-3.el7.x86_64.rpm"
+yum localinstall -y --disablerepo="*" ${CREATEREPO_PACKAGES}
 createrepo .
 popd
 
@@ -46,16 +57,19 @@ pip3 install ${INSTALL_PIP_DIR}/pyjade*
 pip3 install ${INSTALL_PIP_DIR}/PyYAML*
 pip3 install ${INSTALL_PIP_DIR}/psycopg2*
 
+USE_UPDATED_PACKAGE_WORKAROUND=0
+
 # Workaround the updated packages issue
+if [ ${USE_UPDATED_PACKAGE_WORKAROUND} -eq 1 ]; then
+    ${YUM_PALETTE} libyaml
 
-${YUM_PALETTE} libyaml
+    ln -s /usr/lib64/libyaml-0.so.2 /usr/lib64/libyaml-0.so.1
 
-ln -s /usr/lib64/libyaml-0.so.2 /usr/lib64/libyaml-0.so.1
+    ${YUM_PALETTE} openssl098e-0.9.8e
 
-${YUM_PALETTE} openssl098e-0.9.8e
-
-ln -s /usr/lib64/libcrypto.so.0.9.8e /usr/lib64/libcrypto.so.0.9.8
-ln -s /usr/lib64/libssl.so.0.9.8e /usr/lib64/libssl.so.0.9.8
+    ln -s /usr/lib64/libcrypto.so.0.9.8e /usr/lib64/libcrypto.so.0.9.8
+    ln -s /usr/lib64/libssl.so.0.9.8e /usr/lib64/libssl.so.0.9.8
+fi
 
 # Install Palette Insight
 ${YUM_PALETTE} palette-insight
