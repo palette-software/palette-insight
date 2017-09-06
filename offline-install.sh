@@ -57,7 +57,7 @@ pip3 install ${INSTALL_PIP_DIR}/pyjade*
 pip3 install ${INSTALL_PIP_DIR}/PyYAML*
 pip3 install ${INSTALL_PIP_DIR}/psycopg2*
 
-USE_UPDATED_PACKAGE_WORKAROUND=0
+USE_UPDATED_PACKAGE_WORKAROUND=1
 
 # Workaround the updated packages issue
 if [ ${USE_UPDATED_PACKAGE_WORKAROUND} -eq 1 ]; then
