@@ -46,7 +46,19 @@ ${YUM_PALETTE} postgresql-devel postgresql-libs gcc python-devel python35u-devel
 ${YUM_PALETTE} palette-insight-toolkit # Insight user and pip3
 
 pip install ${INSTALL_PIP_DIR}/MarkupSafe* # for Mako
-pip install ${INSTALL_PIP_DIR}/*
+pip install ${INSTALL_PIP_DIR}/argparse*
+pip install ${INSTALL_PIP_DIR}/Jinja2*
+pip install ${INSTALL_PIP_DIR}/Mako*
+pip install ${INSTALL_PIP_DIR}/meld3*
+pip install ${INSTALL_PIP_DIR}/six*
+pip install ${INSTALL_PIP_DIR}/pyjade*
+pip install ${INSTALL_PIP_DIR}/PyYAML*
+pip install ${INSTALL_PIP_DIR}/supervisor*
+
+# Install psycopg2 package supported on this platform
+for PSYCOPG2_PACKAGE in ${INSTALL_PIP_DIR}/psycopg2/*; do
+    pip install ${PSYCOPG2_PACKAGE} && break;
+done
 
 # Because of Supervisorctl
 pip3 install ${INSTALL_PIP_DIR}/MarkupSafe*
@@ -55,8 +67,11 @@ pip3 install ${INSTALL_PIP_DIR}/Mako*
 pip3 install ${INSTALL_PIP_DIR}/six*
 pip3 install ${INSTALL_PIP_DIR}/pyjade*
 pip3 install ${INSTALL_PIP_DIR}/PyYAML*
-pip3 install ${INSTALL_PIP_DIR}/psycopg2*
 
+# Install psycopg2 package supported on this platform
+for PSYCOPG2_PACKAGE in ${INSTALL_PIP_DIR}/psycopg2/*; do
+    pip3 install ${PSYCOPG2_PACKAGE} && break;
+done
 
 
 # Install Palette Insight
