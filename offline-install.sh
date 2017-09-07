@@ -57,19 +57,7 @@ pip3 install ${INSTALL_PIP_DIR}/pyjade*
 pip3 install ${INSTALL_PIP_DIR}/PyYAML*
 pip3 install ${INSTALL_PIP_DIR}/psycopg2*
 
-USE_UPDATED_PACKAGE_WORKAROUND=1
 
-# Workaround the updated packages issue
-if [ ${USE_UPDATED_PACKAGE_WORKAROUND} -eq 1 ]; then
-    ${YUM_PALETTE} libyaml
-
-    ln -s /usr/lib64/libyaml-0.so.2 /usr/lib64/libyaml-0.so.1
-
-    ${YUM_PALETTE} openssl098e-0.9.8e
-
-    ln -s /usr/lib64/libcrypto.so.0.9.8e /usr/lib64/libcrypto.so.0.9.8
-    ln -s /usr/lib64/libssl.so.0.9.8e /usr/lib64/libssl.so.0.9.8
-fi
 
 # Install Palette Insight
 ${YUM_PALETTE} palette-insight
