@@ -37,7 +37,7 @@ enabled=1
 gpgcheck=0
 EOF
 
-YUM_PALETTE='yum install -y --disablerepo=* --enablerepo=palettelocal'
+YUM_PALETTE='yum install -y --enablerepo=palettelocal'
 
 # For pip install
 ${YUM_PALETTE} python-pip python35u-pip
