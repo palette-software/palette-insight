@@ -29,6 +29,30 @@ yum localinstall -y --disablerepo="*" ${CREATEREPO_PACKAGES}
 createrepo .
 popd
 
+install_suitable_psycopg2() {
+    PIP_COMMAND=$1
+    SUCCESS=0
+    INSTALL_LOG=psycopg2_install.log
+    echo "Installing psycopg2 from local packages with ${PIP_COMMAND}"
+    for PSYCOPG2_PACKAGE in ${INSTALL_PIP_DIR}/psycopg2/*; do
+        ${PIP_COMMAND} install ${PSYCOPG2_PACKAGE} >> ${INSTALL_LOG} 2>&1
+	if [ $? -eq 0 ]; then
+            SUCCESS=1;
+            break;
+        fi
+    done
+
+    if [ ${SUCCESS} -eq 1 ]; then
+        echo "Successfully ${PIP_COMMAND} installed psycopg2"
+        rm -f ${INSTALL_LOG}
+    else
+        >&2 echo "Failed to ${PIP_COMMAND} install psycopg2!"
+        cat ${INSTALL_LOG}
+        rm -f ${INSTALL_LOG}
+        exit 1
+    fi
+}
+
 cat > /etc/yum.repos.d/palettelocal.repo << EOF
 [palettelocal]
 name=Palette Local
@@ -56,9 +80,7 @@ pip install ${INSTALL_PIP_DIR}/PyYAML*
 pip install ${INSTALL_PIP_DIR}/supervisor*
 
 # Install psycopg2 package supported on this platform
-for PSYCOPG2_PACKAGE in ${INSTALL_PIP_DIR}/psycopg2/*; do
-    pip install ${PSYCOPG2_PACKAGE} && break;
-done
+install_suitable_psycopg2 pip
 
 # Because of Supervisorctl
 pip3 install ${INSTALL_PIP_DIR}/MarkupSafe*
@@ -69,10 +91,7 @@ pip3 install ${INSTALL_PIP_DIR}/pyjade*
 pip3 install ${INSTALL_PIP_DIR}/PyYAML*
 
 # Install psycopg2 package supported on this platform
-for PSYCOPG2_PACKAGE in ${INSTALL_PIP_DIR}/psycopg2/*; do
-    pip3 install ${PSYCOPG2_PACKAGE} && break;
-done
-
+install_suitable_psycopg2 pip3
 
 # Install Palette Insight
 ${YUM_PALETTE} palette-insight
