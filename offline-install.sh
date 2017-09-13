@@ -15,6 +15,9 @@ if [ ! -d ${INSTALL_ROOT_DIR}/pip ]; then
     exit 1
 fi
 
+# Prevent pip to look for newer pip version online
+export PIP_DISABLE_PIP_VERSION_CHECK=1
+
 pushd ${INSTALL_ROOT_DIR}/rpm
 INSTALL_RPM_DIR=$(pwd)
 popd
