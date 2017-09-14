@@ -7,6 +7,12 @@ This package is supposed to be the last one being installed during updates, so t
 
 # Installation
 
+### Open ports
+Make sure that the following ports are allowed both for inbound and outbound connections by your firewall:
+* 22 (SSH)
+* 80, 443 (HTTP, HTTPS)
+* 5432 (PostgreSql)
+
 ### Make sure Palette RPM repository is enabled
 
 IUS and EPEL repositories are needed. Make sure you install the propriate packages from here:
