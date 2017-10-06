@@ -36,3 +36,24 @@ To install all Palette Insight server side components just execute the following
 # Palette Insight Architecture
 
 ![GitHub Logo](https://github.com/palette-software/palette-insight/blob/master/insight-system-diagram.png?raw=true)
+
+# Log file locations
+Here are the log file locations on the Insight Server for each Palette Insight components:
+* palette-insight-server: `/var/log/palette-insight-server/palette-insight-server.log`
+* palette-greenplum-installer: `/var/log/greenplum/service.log`
+* palette-insight-gp-import:
+  * `/var/log/insight-gp-import/loadtables.log`
+  * `/var/log/insight-gpfdist/insight-gpfdist.log`
+* palette-insight-reporting-framework:
+  * `/var/log/insight-reporting-framework/reporting.log`
+  * `/var/log/insight-reporting-framework/reporting_delta.log`
+  * `/var/log/insight-reporting-framework/loadctrl.log`
+  * `/var/log/insight-reporting-framework/db_maintenance.log`
+* palette-insight-website: `/var/log/palette-insight-website/website.log`
+
+And here are the log files that can be found on your Tableau Server machines:
+* palette-insight-agent: `<PALETTE_INSIGHT_INSTALL_DIR>\Logs\PaletteInsightAgent.nlog.txt`
+* palette-updater:
+  * `<PALETTE_INSIGHT_INSTALL_DIR>\Logs\watchdog.log`
+  * `<PALETTE_INSIGHT_INSTALL_DIR>\Logs\manager.log` (this file only exists if Palette Insight Agent was auto updated at least once)
+  * `<PALETTE_INSIGHT_INSTALL_DIR>\Logs\installer.log` (this file only exists if Palette Insight Agent was auto updated at least once)
