@@ -48,7 +48,8 @@ If there is an update available in our [Palette RPM](http://palette-rpm.brillian
 1. Click on the `Update` button on your Insight Server's control page (http://your-insight-server-url/control)
 <img src="https://github.com/palette-software/PaletteInsightAgent/blob/master/docs/resources/insight-server-control-page.png" alt="Insight Server Control Page" width="400" >
 2. Via command line:
-```bash
+
+```
 su - insight
 /opt/insight-toolkit/update.sh
 ```
