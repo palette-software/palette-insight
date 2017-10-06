@@ -46,7 +46,7 @@ The only thing that you need to do to have a fully functional Insight Server is 
 ### Update
 If there is an update available in our [Palette RPM](http://palette-rpm.brilliant-data.net/) repository, you can update Palette Insight 2 ways:
 1. Click on the `Update` button on your Insight Server's control page (http://your-insight-server-url/control)
-<img src="https://github.com/palette-software/PaletteInsightAgent/blob/master/docs/resources/insight-server-control-page.png?raw=true" alt="Insight Server Control Page" style="width: 500px;"/>
+<img src="https://github.com/palette-software/PaletteInsightAgent/blob/master/docs/resources/insight-server-control-page.png" alt="Insight Server Control Page" width="400" >
 2. Via command line:
 ```bash
 su - insight
