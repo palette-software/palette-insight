@@ -7,6 +7,19 @@ This package is supposed to be the last one being installed during updates, so t
 
 # Installation
 
+## Machine requirements
+Red Hat Enterprise Linux or CentOS version 6 or 7.3+
+* CPU: 8 vCPU
+* Memory: 16 GB
+* Volumes:
+  * 10 GB system
+  * 32GB Swap Memory
+  * 1 TB data (3 TB recommended) mounted under `/data`
+* Recommended network access to:
+  * https://palette-rpm.brilliant-data.net
+  * http://mirror.centos.org
+
+
 ### Open ports
 Make sure that the following ports are allowed both for inbound and outbound connections by your firewall:
 * 22 (SSH)
