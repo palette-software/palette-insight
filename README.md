@@ -14,7 +14,7 @@ Red Hat Enterprise Linux or CentOS version 6 or 7.3+
 * Volumes:
   * 10 GB system
   * 32GB Swap Memory
-  * 1 TB data (3 TB recommended) mounted under `/data`
+  * 1 TB data (3 TB recommended) mounted under `/data` and formatted as [XFS](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/storage_administration_guide/ch-xfs)
 * Recommended network access to:
   * https://palette-rpm.brilliant-data.net
   * http://mirror.centos.org
