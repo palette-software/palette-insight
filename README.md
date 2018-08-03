@@ -5,9 +5,9 @@ One RPM package above all Palette Insight related RPM packages.
 
 This package is supposed to be the last one being installed during updates, so this package's post install steps can be used to perform custom commands during Palette Insight updates.
 
-# Installation
+## Prerequisites
 
-## Machine requirements
+### Machine requirements
 Red Hat Enterprise Linux or CentOS version 6 or 7.3+
 * CPU: 8 vCPU
 * Memory: 16 GB
@@ -19,28 +19,36 @@ Red Hat Enterprise Linux or CentOS version 6 or 7.3+
   * https://palette-rpm.brilliant-data.net
   * http://mirror.centos.org
 
-
 ### Open ports
 Make sure that the following ports are allowed both for inbound and outbound connections by your firewall:
 * 22 (SSH)
 * 80, 443 (HTTP, HTTPS)
 * 5432 (PostgreSql)
 
-### Make sure Palette RPM repository is enabled
+### Enable required RPM repositories
+
+#### IUS and EPEL repositories
 
 IUS and EPEL repositories are needed. Make sure you install the propriate packages from here:
 https://ius.io/GettingStarted/
 
+#### Palette RPM repository
+
 ```
-centos@ip-10-47-14-86:~$ sudo vi /etc/yum.repos.d/palette.repo
+$ sudo tee /etc/yum.repos.d/palette.repo << EOF
 [palette-rpm]
 name=Palette RPM
 baseurl=https://palette-rpm.brilliant-data.net/centos/stable
 enabled=1
 gpgcheck=0
+EOF
 ```
 
-### Install
+### Data folder
+
+The Palette Insight and the [Greenplum Database](https://github.com/palette-software/greenplum-installer) store significant amount of data under the `/data` directory. Please make sure to set it up according to the [Machine requirements](#machine-requirements).
+
+## Install
 
 To install all Palette Insight server side components just execute the following:
 
@@ -67,11 +75,11 @@ su - insight
 /opt/insight-toolkit/update.sh
 ```
 
-# Palette Insight Architecture
+## Palette Insight Architecture
 
 ![GitHub Logo](https://github.com/palette-software/palette-insight/blob/master/insight-system-diagram.png?raw=true)
 
-# Log file locations
+## Log file locations
 Here are the log file locations on the Insight Server for each Palette Insight components:
 * palette-insight-server: `/var/log/palette-insight-server/palette-insight-server.log`
 * palette-greenplum-installer: `/var/log/greenplum/service.log`
