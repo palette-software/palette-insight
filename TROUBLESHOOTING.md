@@ -39,7 +39,7 @@ order by 1 desc
 ;
 ```
 
-### Repository setup in Config.yaml
+### Repository setup in Config.yml
 
 Connection details and credentials should be under `TableauRepo` key.
 
@@ -54,7 +54,7 @@ TableauRepo:
   Password: onlyread
 ```
 
-Poll is activated by `UseRepoPolling` and `PreferPassiveRepo`.
+Tableau repo poll is activated by default and it is being collected from the passive repository node by default. `UseRepoPolling` and `PreferPassiveRepo` keys can alter the default behavior.
 
 Poll from active:
 
