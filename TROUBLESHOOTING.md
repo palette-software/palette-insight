@@ -2,6 +2,11 @@
 
 ## Check installed datamodel version
 
+For example you can acces the Greenplum database via this shell command:
+```bash
+psql -d palette -h 127.0.0.1 -U readonly
+```
+and then execute the following statement:
 ```sql
 select *
 from
