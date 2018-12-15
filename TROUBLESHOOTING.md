@@ -83,27 +83,57 @@ Check `connections.yml`.
 
 
 ### Reload the last day (e.g. 2018-12-11)
+
 ```sql
+
+-- check load dates
 select * from palette.p_load_dates order by 1 desc limit 5;
 
+-- check_if_load_date_already_in_table
+select 'p_background_jobs',palette.check_if_load_date_already_in_table('palette', 'p_background_jobs', '2018-12-11', true) union all
+select 'p_background_jobs_hourly',palette.check_if_load_date_already_in_table('palette', 'p_background_jobs_hourly', '2018-12-11', true) union all
+select 'p_cpu_usage',palette.check_if_load_date_already_in_table('palette', 'p_cpu_usage', '2018-12-11', true) union all
+select 'p_cpu_usage_bootstrap_rpt',palette.check_if_load_date_already_in_table('palette', 'p_cpu_usage_bootstrap_rpt', '2018-12-11', true) union all
+select 'p_cpu_usage_hourly',palette.check_if_load_date_already_in_table('palette', 'p_cpu_usage_hourly', '2018-12-11', true) union all
+select 'p_cpu_usage_report',palette.check_if_load_date_already_in_table('palette', 'p_cpu_usage_report', '2018-12-11', true) union all
+select 'p_desktop_session',palette.check_if_load_date_already_in_table('palette', 'p_desktop_session', '2018-12-11', true) union all
+select 'p_errorlogs',palette.check_if_load_date_already_in_table('palette', 'p_errorlogs', '2018-12-11', true) union all
+select 'p_http_requests',palette.check_if_load_date_already_in_table('palette', 'p_http_requests', '2018-12-11', true) union all
+select 'p_interactor_session',palette.check_if_load_date_already_in_table('palette', 'p_interactor_session', '2018-12-11', true) union all
+select 'p_load_dates',palette.check_if_load_date_already_in_table('palette', 'p_load_dates', '2018-12-11', true) union all
+select 'p_serverlogs',palette.check_if_load_date_already_in_table('palette', 'p_serverlogs', '2018-12-11', true) union all
+select 'p_serverlogs_bootstrap_rpt',palette.check_if_load_date_already_in_table('palette', 'p_serverlogs_bootstrap_rpt', '2018-12-11', true) union all
+select 't_tde_filename_pids',palette.check_if_load_date_already_in_table('palette', 't_tde_filename_pids', '2018-12-11', true) union all
+select 'end',0;
+
+-- count records
+select 'p_background_jobs', count(1) from palette.p_background_jobs where created_at > date'2018-12-11' union all
 select 'p_cpu_usage' as table_name, count(1) as cnt from palette.p_cpu_usage where ts_rounded_15_secs > date'2018-12-11' union all
+select 'p_cpu_usage_hourly', count(1) from palette.p_cpu_usage_hourly where hour > date'2018-12-11' union all
 select 'p_cpu_usage_report', count(1) from palette.p_cpu_usage_report where cpu_usage_ts_rounded_15_secs > date'2018-12-11' union all
 select 'p_desktop_session', count(1) from palette.p_desktop_session where session_start_ts > date'2018-12-11' union all
+select 'p_http_requests', count(1) from palette.p_http_requests where created_at > date'2018-12-11' union all
 select 'p_interactor_session', count(1) from palette.p_interactor_session where session_start_ts > date'2018-12-11' union all
+select 'p_serverlogs', count(1) from palette.p_serverlogs where start_ts > date'2018-12-11' union all
 select 'p_serverlogs_bootstrap_rpt', count(1) from palette.p_serverlogs_bootstrap_rpt where start_ts > date'2018-12-11' union all
 select 'p_cpu_usage_bootstrap_rpt', count(1) from palette.p_cpu_usage_bootstrap_rpt where cpu_usage_ts_rounded_15_secs> date'2018-12-11' union all
 select 'p_errorlogs', count(1) from palette.p_errorlogs where ts > date'2018-12-11';
 
-
+-- delete day
+delete from palette.p_background_jobs where created_at >= date'2018-12-11';
 alter table palette.p_cpu_usage truncate partition "20181211";
 alter table palette.p_cpu_usage_report truncate partition "20181211";
 alter table palette.p_cpu_usage truncate partition "20181212";
+delete from palette.p_cpu_usage_hourly where hour > date'2018-12-11';
 alter table palette.p_cpu_usage_report truncate partition "20181212";
 delete from palette.p_desktop_session where session_start_ts >= date'2018-12-11';
+delete from palette.p_http_requests where created_at >= date'2018-12-11';
 delete from palette.p_interactor_session where session_start_ts >= date'2018-12-11';
+alter table palette.p_serverlogs truncate partition "20181211";
 alter table palette.p_serverlogs_bootstrap_rpt truncate partition "20181211";
 delete from palette.p_cpu_usage_bootstrap_rpt where cpu_usage_ts_rounded_15_secs >= date'2018-12-11';
 alter table palette.p_errorlogs truncate partition "20181211";
+
 
 delete from palette.p_load_dates where load_date = date'2018-12-11';
 ```
