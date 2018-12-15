@@ -83,7 +83,7 @@ Check `connections.yml`.
 
 
 ### Reload the last day (e.g. 2018-12-11)
-```
+```sql
 select * from palette.p_load_dates order by 1 desc limit 5;
 
 select 'p_cpu_usage' as table_name, count(1) as cnt from palette.p_cpu_usage where ts_rounded_15_secs > date'2018-12-11' union all
