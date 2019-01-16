@@ -16,6 +16,12 @@ limit 1
 ;
 ```
 
+## Check the last sessions that should show up in the Performance dashboard
+The table `p_interactor_session_normal` is feeding the Performance dashboard.
+```sql
+select * from palette.p_interactor_session_normal order by session_start_ts desc limit 10;
+```
+
 ## Repository polling
 
 ### Logs
