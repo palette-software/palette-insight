@@ -50,6 +50,63 @@ order by 1 desc
 ;
 ```
 
+### Insight has fallen too much behind in processing one ore more Tableau repo tables
+If you have a feeling or proof that any of the Tableau repo tables is not being fetched properly, then you can take the following measurement. *WARNING*: this measurement results in skipping data between our last successful data process and now!
+
+In our example, let's assume that we realize that `http_requests` table is not being populated at all since last week. And also let's say that we find log lines like this from the Insight Agents which are running on the repository nodes of Tableau.
+
+```
+2019/01/23 14:26:05.856 [19]  ERROR    PaletteInsightAgent.RepoTablesPoller.Tableau9RepoConn - NPGSQL exception while retreiving data from Tableau repository Query: select * from http_requests where id > '184439774
+' and id <= '199157406' Exception: Npgsql.NpgsqlException (0x80004005): 57014: canceling statement due to statement timeout
+   at Npgsql.NpgsqlConnector.DoReadSingleMessage(DataRowLoadingMode dataRowLoadingMode, Boolean returnNullForAsyncMessage, Boolean isPrependedMessage)
+   at Npgsql.NpgsqlConnector.ReadSingleMessage(DataRowLoadingMode dataRowLoadingMode, Boolean returnNullForAsyncMessage)
+   at Npgsql.NpgsqlDataReader.ReadMessage()
+   at Npgsql.NpgsqlDataReader.ReadInternal()
+   at Npgsql.NpgsqlDataReader.Read()
+   at System.Data.Common.DataAdapter.FillLoadDataRow(SchemaMapping mapping)
+   at System.Data.Common.DataAdapter.FillFromReader(DataSet dataset, DataTable datatable, String srcTable, DataReaderContainer dataReader, Int32 startRecord, Int32 maxRecords, DataColumn parentChapterColumn, Object parentChapterValue)
+   at System.Data.Common.DataAdapter.Fill(DataTable[] dataTables, IDataReader dataReader, Int32 startRecord, Int32 maxRecords)
+   at System.Data.Common.DbDataAdapter.FillInternal(DataSet dataset, DataTable[] datatables, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable[] dataTables, Int32 startRecord, Int32 maxRecords, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable dataTable)
+   at PaletteInsightAgent.RepoTablesPoller.Tableau9RepoConn.<>c__DisplayClass11_0.<runQuery>b__0()
+   at PaletteInsightAgent.RepoTablesPoller.Tableau9RepoConn.queryWithReconnect(Func`1 query, Object def, String sqlStatement) 
+```
+
+or
+
+```
+2019/01/23 13:56:02.852 [30]  ERROR    PaletteInsightAgent.RepoTablesPoller.RepoPollAgent - Error while polling streaming table: 'http_requests'! Exception:  Exception of type 'System.OutOfMemoryException' was thrown.    at System.String.CreateStringFromEncoding(Byte* bytes, Int32 byteLength, Encoding encoding)
+   at System.Text.UTF8Encoding.GetString(Byte[] bytes, Int32 index, Int32 count)
+   at Npgsql.NpgsqlBuffer.ReadString(Int32 byteLen)
+   at Npgsql.TypeHandlers.TextHandler.Read(String& result)
+   at Npgsql.TypeHandler.Read[T](NpgsqlBuffer buf, Int32 len, FieldDescription fieldDescription)
+   at Npgsql.TypeHandler.Read[T](DataRowMessage row, Int32 len, FieldDescription fieldDescription)
+   at Npgsql.TypeHandler`1.ReadValueAsObject(DataRowMessage row, FieldDescription fieldDescription)
+   at Npgsql.NpgsqlDataReader.GetValue(Int32 ordinal)
+   at Npgsql.NpgsqlDataReader.GetValues(Object[] values)
+   at System.Data.ProviderBase.DataReaderContainer.CommonLanguageSubsetDataReader.GetValues(Object[] values)
+   at System.Data.ProviderBase.SchemaMapping.LoadDataRow()
+   at System.Data.Common.DataAdapter.FillLoadDataRow(SchemaMapping mapping)
+   at System.Data.Common.DataAdapter.FillFromReader(DataSet dataset, DataTable datatable, String srcTable, DataReaderContainer dataReader, Int32 startRecord, Int32 maxRecords, DataColumn parentChapterColumn, Object parentChapterValue)
+   at System.Data.Common.DataAdapter.Fill(DataTable[] dataTables, IDataReader dataReader, Int32 startRecord, Int32 maxRecords)
+   at System.Data.Common.DbDataAdapter.FillInternal(DataSet dataset, DataTable[] datatables, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable[] dataTables, Int32 startRecord, Int32 maxRecords, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable dataTable)
+   at PaletteInsightAgent.RepoTablesPoller.Tableau9RepoConn.<>c__DisplayClass11_0.<runQuery>b__0()
+   at PaletteInsightAgent.RepoTablesPoller.Tableau9RepoConn.queryWithReconnect(Func`1 query, Object def, String sqlStatement)
+   at PaletteInsightAgent.RepoTablesPoller.Tableau9RepoConn.runQuery(String query)
+   at PaletteInsightAgent.RepoTablesPoller.Tableau9RepoConn.GetStreamingTable(String tableName, RepoTable table, String from, String& newMax)
+   at PaletteInsightAgent.RepoTablesPoller.RepoPollAgent.<>c__DisplayClass5_0.<PollStreamingTables>b__1(RepoTable table)
+```
+
+An option to overcome this situation is to look up the latest id from `http_requests` table from the Tableau repository:
+```sql
+select max(id) from http_requests;
+```
+
+Let's say that the result of the query is 44783665. Look up `/data/insight-server/maxids/palette/http_requests` and replace its content to 44783665.
+
 ### Repository setup in Config.yml
 
 Connection details and credentials should be under `TableauRepo` key.
