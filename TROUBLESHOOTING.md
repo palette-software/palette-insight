@@ -1,12 +1,21 @@
 # Troubleshooting for Palette Insight
 
+## Access the Palette Database locally on the Palette Server
+
+You can access the Greenplum database via this shell command:
+
+```bash
+psql -h 127.0.0.1 -d palette -U readonly
+```
+
+or
+
+```bash
+psql -h 127.0.0.1 -d palette -U palette
+```
+
 ## Check installed datamodel version
 
-For example you can acces the Greenplum database via this shell command:
-```bash
-psql -d palette -h 127.0.0.1 -U readonly
-```
-and then execute the following statement:
 ```sql
 select *
 from
@@ -16,10 +25,29 @@ limit 1
 ;
 ```
 
-## Check the last sessions that should show up in the Performance dashboard
+## Performance dashboard missing data
+
+### Check the last sessions that should show up in the Performance dashboard
+
 The table `p_interactor_session_normal` is feeding the Performance dashboard.
 ```sql
 select * from palette.p_interactor_session_normal order by session_start_ts desc limit 10;
+```
+
+### Datasource extracts are failing because of timeout (7200 seconds)
+
+#### Check the size of the tables
+
+```sql
+select count(1) from palette.p_cpu_usage_bootstrap_rpt;
+select count(1) from palette.p_serverlogs_bootstrap_rpt;
+select count(1) from palette.p_interactor_session;
+```
+
+#### Drop archive data
+
+```sql
+alter table palette.p_interactor_session drop partition "2018";
 ```
 
 ## Repository polling
@@ -144,8 +172,7 @@ NOTE: Config change requires the _RESTART_ of the Agent.
 
 Check `connections.yml`.
 
-
-### Reload the last day (e.g. 2018-12-11)
+## Reload the last day (e.g. 2018-12-11)
 
 ```sql
 
