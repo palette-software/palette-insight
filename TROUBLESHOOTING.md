@@ -14,7 +14,9 @@ or
 psql -h 127.0.0.1 -d palette -U palette
 ```
 
-## Check installed datamodel version
+## Get information from the database
+
+### Check installed datamodel version
 
 ```sql
 select *
@@ -23,6 +25,13 @@ from
 order by 1 desc
 limit 1
 ;
+```
+
+### Get all the tables of the DB
+
+```sql
+select * from information_schema.tables
+where table_schema = 'palette';
 ```
 
 ## Performance dashboard missing data
@@ -42,6 +51,14 @@ select * from palette.p_interactor_session_normal order by session_start_ts desc
 select count(1) from palette.p_cpu_usage_bootstrap_rpt;
 select count(1) from palette.p_serverlogs_bootstrap_rpt;
 select count(1) from palette.p_interactor_session;
+```
+
+#### Check partitions of a table
+
+```sql
+SELECT i.inhrelid::regclass AS child
+FROM   pg_inherits i
+WHERE  i.inhparent = 'palette.p_interactor_session'::regclass;	
 ```
 
 #### Drop archive data
