@@ -31,7 +31,21 @@ limit 1
 
 ```sql
 select * from information_schema.tables
-where table_schema = 'palette';
+where table_schema = 'palette' and table_type='BASE TABLE';
+```
+
+or
+
+```sql
+select * from pg_tables where schemaname='palette';
+```
+
+### Check whether DEBUG logs are enabled
+
+The following SQL should return `debug` rows too.
+
+```sql
+select sev, count(1) from palette.p_serverlogs_bootstrap_rpt group by sev;
 ```
 
 ## Performance dashboard missing data
@@ -59,6 +73,13 @@ select count(1) from palette.p_interactor_session;
 SELECT i.inhrelid::regclass AS child
 FROM   pg_inherits i
 WHERE  i.inhparent = 'palette.p_interactor_session'::regclass;	
+```
+
+or
+
+```sql
+select * from pg_partitions
+where schemaname='palette' and tablename='p_interactor_session' and partitiontype='range';
 ```
 
 #### Drop archive data
