@@ -50,11 +50,29 @@ select sev, count(1) from palette.p_serverlogs_bootstrap_rpt group by sev;
 
 ## Performance dashboard missing data
 
+### Check the last loaded day
+
+```sql
+select max(load_date)
+from p_load_dates;
+```
+
+### Check incrementally loaded tables (maxids)
+
+See [example for `http_requests` table](#compare-maxids-in-tableau-and-insight-server).
+
 ### Check the last sessions that should show up in the Performance dashboard
 
 The table `p_interactor_session_normal` is feeding the Performance dashboard.
 ```sql
 select * from palette.p_interactor_session_normal order by session_start_ts desc limit 10;
+```
+
+```sql
+select session_start_ts::date, count(1)
+from palette.p_interactor_session_normal
+group by session_start_ts::date
+order by session_start_ts::date;
 ```
 
 ### Datasource extracts are failing because of timeout (7200 seconds)
@@ -65,6 +83,12 @@ select * from palette.p_interactor_session_normal order by session_start_ts desc
 select count(1) from palette.p_cpu_usage_bootstrap_rpt;
 select count(1) from palette.p_serverlogs_bootstrap_rpt;
 select count(1) from palette.p_interactor_session;
+```
+
+#### Check the number of records by day
+
+```sql
+select start_ts::date, count(1) from palette.p_serverlogs_bootstrap_rpt group by start_ts::date order by start_ts::date;
 ```
 
 #### Check partitions of a table
@@ -116,8 +140,28 @@ order by 1 desc
 ;
 ```
 
-### Insight has fallen too much behind in processing one ore more Tableau repo tables
-If you have a feeling or proof that any of the Tableau repo tables is not being fetched properly, then you can take the following measurement. *WARNING*: this measurement results in skipping data between our last successful data process and now!
+### Insight has fallen too much behind in processing one or more Tableau repo tables
+#### Issue
+
+If you have a feeling or proof that any of the Tableau repo tables is not being fetched properly, then you can take the following measurement.
+
+#### Compare maxids in Tableau and Insight Server
+
+##### To check the last id of the synchronized record of `http_requests` at Insight Server
+
+```bash
+cat /data/insight-server/maxids/palette/http_requests
+```
+
+##### To check the most recent record id in Tableau
+
+First you need to connect to the `workgroup` database of the Tableau Server and then execute:
+
+```sql
+select max(id) from http_requests;
+```
+
+#### Error in agent logs
 
 In our example, let's assume that we realize that `http_requests` table is not being populated at all since last week. And also let's say that we find log lines like this from the Insight Agents which are running on the repository nodes of Tableau.
 
@@ -166,7 +210,12 @@ or
    at PaletteInsightAgent.RepoTablesPoller.RepoPollAgent.<>c__DisplayClass5_0.<PollStreamingTables>b__1(RepoTable table)
 ```
 
+#### Solution
+
+*WARNING*: this measurement results in skipping data between our last successful data process and now!
+
 An option to overcome this situation is to look up the latest id from `http_requests` table from the Tableau repository:
+
 ```sql
 select max(id) from http_requests;
 ```
@@ -265,3 +314,43 @@ alter table palette.p_errorlogs truncate partition "20181211";
 
 delete from palette.p_load_dates where load_date = date'2018-12-11';
 ```
+
+## Firewall
+
+In order to test whether the neccessary ports are open on the firewall visit the following page:
+
+```
+http://<IP_OR_HOST_OF_INSIGHT_SERVER>
+```
+
+and
+
+```
+https://<IP_OR_HOST_OF_INSIGHT_SERVER>/api/v1/ping
+```
+
+Please note HTTP and HTTPS respectively.
+
+To open the ports on the firewall use either `lokkit` or `firewalld-cmd`.
+
+### Enable the http/s services on the firewall
+We experienced that lokkit is overriding the existing iptables, thus we need to make sure that ssh service will still remain enabled.
+
+```bash
+lokkit --service=ssh
+lokkit --service=http
+lokkit --service=https
+lokkit --service=postgresql
+```
+
+If firelwallD is enabled, try the following
+
+```bash
+firewall-cmd --zone=public --add-service=http
+firewall-cmd --zone=public --add-service=https
+firewall-cmd --zone=public --add-service=postgresql
+firewall-cmd --zone=public --permanent --add-service=http
+firewall-cmd --zone=public --permanent --add-service=https
+firewall-cmd --zone=public --permanent --add-service=postgresql
+```
+
