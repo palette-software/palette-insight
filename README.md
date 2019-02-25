@@ -50,16 +50,31 @@ The Palette Insight and the [Greenplum Database](https://github.com/palette-soft
 
 ## Install
 
+### Final check before install
+
+1. The `/data` folder exists
+1. IUS and EPEL repositories are added
+1. Palette RPM repository added
+1. Ports are open on firewall
+
+### Install
+
 To install all Palette Insight server side components just execute the following:
 
 `sudo yum install -y palette-insight`
 
+### Post install check
+
 Make sure that there is no error in the output of the `yum` command above, and make sure that `/var/log/palette-insight-reporting/install-data-model.log` file is created and it contains a line like this at the end:
+
 ```
 -------------------- OK --------------------
 ```
 
+### Post install configuration
+
 The only thing that you need to do to have a fully functional Insight Server is to set a license key. Any GUID would do as a license key as of this project has been open sourced. Just run the following script as root and you are done:
+
 ```
 /etc/palette-insight-server/set-license-key.sh <GUID>
 ```
