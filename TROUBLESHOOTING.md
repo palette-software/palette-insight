@@ -1,5 +1,11 @@
 # Troubleshooting for Palette Insight
 
+## Access the Tableu Repository from the Palette Server
+
+```bash
+psql -h <ADDRESS_OF_THE_TABLEAU_REPOSITORY> -d workgroup -U readonly -p 8060
+```
+
 ## Access the Palette Database locally on the Palette Server
 
 You can access the Greenplum database via this shell command:
@@ -40,12 +46,93 @@ or
 select * from pg_tables where schemaname='palette';
 ```
 
+### Check the size of the databases
+
+```sql
+SELECT pg_database.datname,
+       pg_size_pretty(pg_database_size(pg_database.datname)) AS size
+FROM pg_database;
+```
+
+### Check the size of the tables
+
+```sql
+SELECT relname                                                                 as "Table",
+       pg_size_pretty(pg_total_relation_size(relid))                           As "Size",
+       pg_size_pretty(pg_total_relation_size(relid) - pg_relation_size(relid)) as "External Size"
+FROM pg_catalog.pg_statio_user_tables
+ORDER BY pg_total_relation_size(relid) DESC;
+```
+
+Check the size and the entries of the tables
+
+```sql
+SELECT relname                                     AS objectname,
+       relkind                                     AS objecttype,
+       reltuples                                   AS "#entries",
+       pg_size_pretty(relpages::bigint * 8 * 1024) AS size
+FROM pg_class
+WHERE relpages >= 8
+ORDER BY relpages DESC;
+```
+
+### Check running processes
+
+```sql
+select * from pg_stat_activity;
+```
+
 ### Check whether DEBUG logs are enabled
 
-The following SQL should return `debug` rows too.
+The following SQL should return `debug` rows too.
 
 ```sql
 select sev, count(1) from palette.p_serverlogs_bootstrap_rpt group by sev;
+```
+
+## Upgrade
+
+### Install new Datamodel
+
+The following steps are to be executed before a new version of the Datamodel is installed
+
+1. Prevent new execution of data load by commenting out the scripts in the crontab of the insight user
+
+1. Wait for the finish of the current data load or terminate the process with:
+
+   ```sql
+   SELECT * FROM pg_stat_activity WHERE state = 'active';
+   SELECT pg_terminate_backend(<pid of the process>);
+   ```
+
+1. Check the reporting.log for terminated or finished job.
+
+1. Install the new version
+
+1. Uncomment the scripts in the crontab of the insight user (change minute part to start data load the in the next minute)
+
+## Missing data from Agents
+
+### Incorrect access token
+
+Please make sure that the value of the key `InsightAuthToken` in the `Config\Config.yml` files on the agents and the `license_key` key of the `/etc/palette-insight-server/server.config` on the server are matching.
+
+### Incorrect server endpoint url
+
+Please make sure that there is no trailing `/` character in the `Endpoint` in the `Config\Config.yml` files on the agents.
+
+Incorrect:
+
+```yaml
+Webservice:
+  Endpoint: https://server/
+```
+
+Correct:
+
+```yaml
+Webservice:
+  Endpoint: https://server
 ```
 
 ## Performance dashboard missing data
@@ -54,7 +141,7 @@ select sev, count(1) from palette.p_serverlogs_bootstrap_rpt group by sev;
 
 ```sql
 select max(load_date)
-from p_load_dates;
+from palette.p_load_dates;
 ```
 
 ### Check incrementally loaded tables (maxids)
@@ -77,7 +164,27 @@ order by session_start_ts::date;
 
 ### Datasource extracts are failing because of timeout (7200 seconds)
 
-#### Check the size of the tables
+#### Check information about the extracts
+
+```sql
+select
+     args
+    ,notes
+    ,title
+    ,started_at
+    ,completed_at
+    ,completed_at - started_at as duration
+    ,*
+from
+    background_jobs
+where 1 = 1
+    and progress = 100
+    and job_name in ('Increment Extracts', 'Refresh Extracts')
+order by created_at desc
+limit 1000;
+```
+
+#### Check number of records in the tables
 
 ```sql
 select count(1) from palette.p_cpu_usage_bootstrap_rpt;
@@ -90,6 +197,36 @@ select count(1) from palette.p_interactor_session;
 ```sql
 select start_ts::date, count(1) from palette.p_serverlogs_bootstrap_rpt group by start_ts::date order by start_ts::date;
 ```
+
+or
+
+```sql
+select
+     created_at::date as created_at
+    ,count(1) as cnt
+    ,min(id) as min_id
+    ,max(id) as max_id
+from
+    palette.http_requests_20190501
+group by
+    created_at::date
+order by 1;
+```
+
+or
+
+```sql
+select
+    ts::date, count(1)
+from
+    palette.backgrounder_logs
+group by
+    ts::date
+order by
+    ts::date;
+```
+
+
 
 #### Check partitions of a table
 
@@ -112,9 +249,75 @@ where schemaname='palette' and tablename='p_interactor_session' and partitiontyp
 alter table palette.p_interactor_session drop partition "2018";
 ```
 
-## Repository polling
+#### Deduplicate data
 
-### Logs
+Create new table without duplicates:
+
+```sql
+create table palette.http_requests_dedup_20190530 as
+select *
+from
+    (select
+         *
+        ,row_number() over (partition by id order by p_cre_date) as rn
+    from
+        palette.http_requests
+    ) a
+where rn = 1;
+```
+
+Drop table with duplicates:
+
+```sql
+DROP TABLE palette.http_requests;
+```
+
+Rename table without duplicates:
+
+```sql
+ALTER TABLE palette.http_requests_dedup_20190530 RENAME TO palette.http_requests;
+```
+
+#### Remove huge amout of data both from agent and server
+
+##### On the Tableau Server nodes
+
+1. Stop the Insight Agent Services (agent and watchdog)
+1. Delete the **data** folder in installation directory of  the Palette Insight Agent
+
+##### On the server
+
+1. Turn off the cronjobs for the insight user:
+
+   ```bash
+   sudo su insight
+   crontab -e
+   # Add the "#" signs to the beginning of the 3 schedules
+   ```
+
+1. Delete the uploads folder:
+
+   ``````bash
+   rm -rf /data/palette-insight-server/uploads/
+   ``````
+
+1. Truncate tables in database:
+
+   ```sql
+   truncate table palette.tmp_http_requests;
+   truncate table palette.http_requests_20190401;
+   truncate table palette.pool_http_requests;
+   ```
+
+1. Turn on the cronjobs for the insight user:
+
+   ```bash
+sudo su insight
+   crontab -e
+# Remove the "#" signs from the beginning of the 3 schedules
+   ```
+
+## Repository polling
 
 The repository is not polled if the log has lines like:
 
@@ -326,7 +529,7 @@ http://<IP_OR_HOST_OF_INSIGHT_SERVER>
 and
 
 ```
-https://<IP_OR_HOST_OF_INSIGHT_SERVER>/api/v1/ping
+  https://<IP_OR_HOST_OF_INSIGHT_SERVER>/api/v1/ping
 ```
 
 Please note HTTP and HTTPS respectively.
