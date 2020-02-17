@@ -195,6 +195,15 @@ select count(1) from palette.p_interactor_session;
 #### Check the number of records by day
 
 ```sql
+select ts_rounded_15_secs::date as day, host_name, count(1) from palette.p_process_class_agg_report
+  where ts_rounded_15_secs > '2020-01-01'::date
+group by 1, 2
+order by 1 desc;
+```
+
+or
+
+```sql
 select start_ts::date, count(1) from palette.p_serverlogs_bootstrap_rpt group by start_ts::date order by start_ts::date;
 ```
 
