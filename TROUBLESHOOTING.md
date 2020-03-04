@@ -96,9 +96,9 @@ select sev, count(1) from palette.p_serverlogs_bootstrap_rpt group by sev;
 
 The following steps are to be executed before a new version of the Datamodel is installed
 
-1. Prevent new execution of data load by commenting out the scripts in the crontab of the insight user
+1. Prevent new execution of reporting by commenting out the scripts in the crontab of the insight user
 
-1. Wait for the finish of the current data load or terminate the process with:
+1. Wait for the finish of the current reporting or terminate the process with:
 
    ```sql
    SELECT * FROM pg_stat_activity WHERE state = 'active';
@@ -107,9 +107,104 @@ The following steps are to be executed before a new version of the Datamodel is 
 
 1. Check the reporting.log for terminated or finished job.
 
+   ```bash
+   less /var/log/insight-reporting-framework/reporting.log
+   ```
+
 1. Install the new version
 
-1. Uncomment the scripts in the crontab of the insight user (change minute part to start data load the in the next minute)
+   ```bash
+   sudo yum install -y palette-insight-reporting-framework-v2.4.0.11-11.x86_64.rpm
+   ```
+
+1. Uncomment the scripts in the crontab of the insight user (change minute part to start reporting the next minute)
+
+## Wipe Insight Server
+
+The following process can be used to wipe all data from the Palette Insight Server.
+
+1. Save the metadata file
+
+    ```bash
+    cd /data
+    find palette-insight-server/ -name metadata\* -print0 | tar -cvf metadata.tar --null -T -
+    ```
+
+1. Stop insight server
+
+   ```bash
+   sudo supervisorctl stop palette-insight-server
+   ```
+
+1. Stop crontab jobs
+
+   Comment the lines in the crontab of the insight user.
+
+   ```bash
+   sudo crontab -u insight -e
+   ```
+
+1. Terminate DB sessions
+
+  ```bash
+  sudo su postgres -g postgres -c "psql"
+  ```
+  
+   ```sql
+  SELECT pg_terminate_backend(pid),pid,datname,usename,state,query FROM pg_stat_activity;
+   ```
+  
+1. Drop DB
+
+   ```sql
+   DROP DATABASE palette;
+   ```
+
+1. Drop palette roles
+
+   ```sql
+   DROP ROLE palette_palette_looker;
+   DROP ROLE palette_palette_updater;
+   DROP ROLE readonly;
+   DROP ROLE readonly_live;
+   DROP ROLE palette;
+   DROP ROLE palette_etl_user;
+   DROP ROLE palette_extract_user;
+   ```
+   
+1. Create DB
+
+   ```sql
+   CREATE DATABASE palette;
+   ```
+
+1. 1. Delete files from /data
+
+   ```bash
+   rm -rf /data/palette-insight-server
+   ```
+
+1. Start crontab jobs
+
+   Uncomment the lines in the crontab of the insight user.
+
+   ```bash
+   sudo crontab -u insight -e
+   ```
+
+1. Start insight server
+
+   ```bash
+   sudo supervisorctl start palette-insight-server
+   ```
+   
+1. Postchecks
+
+   ```bash
+   sudo supervisorctl status
+   sudo crontab -u insight -l
+   tail -f /var/log/palette-insight-server/loadtables.log
+   ```
 
 ## Missing data from Agents
 
@@ -134,6 +229,10 @@ Correct:
 Webservice:
   Endpoint: https://server
 ```
+
+## Greenplum Out of memory
+
+https://greenplum.org/calc/
 
 ## Performance dashboard missing data
 
@@ -162,21 +261,25 @@ group by session_start_ts::date
 order by session_start_ts::date;
 ```
 
+```sql
+select session_start_ts::date, count(1)
+from palette.p_interactor_sessions
+group by session_start_ts::date
+order by session_start_ts::date;
+```
+
 ### Datasource extracts are failing because of timeout (7200 seconds)
 
 #### Check information about the extracts
 
 ```sql
 select
-     args
-    ,notes
-    ,title
+    title
     ,started_at
     ,completed_at
     ,completed_at - started_at as duration
-    ,*
 from
-    background_jobs
+        palette.background_jobs
 where 1 = 1
     and progress = 100
     and job_name in ('Increment Extracts', 'Refresh Extracts')
@@ -216,7 +319,7 @@ select
     ,min(id) as min_id
     ,max(id) as max_id
 from
-    palette.http_requests_20190501
+    palette.http_requests
 group by
     created_at::date
 order by 1;
@@ -233,6 +336,14 @@ group by
     ts::date
 order by
     ts::date;
+```
+
+or
+
+```sql
+select ts_rounded_15_secs::date as day, host_name, count(1) from palette.p_process_class_agg_report
+group by 1, 2
+order by 1 desc;
 ```
 
 
@@ -323,16 +434,15 @@ ALTER TABLE palette.http_requests_dedup_20190530 RENAME TO palette.http_requests
    ```bash
 sudo su insight
    crontab -e
-# Remove the "#" signs from the beginning of the 3 schedules
+   # Remove the "#" signs from the beginning of the 3 schedules
    ```
-
 ## Repository polling
 
 The repository is not polled if the log has lines like:
 
-```text
+   ```text
 Target Tableau repo is not located on this computer. Skip polling full tables.
-```
+   ```
 
 ```text
 Target Tableau repo is not located on this computer. Skip polling streaming tables.
