@@ -676,3 +676,14 @@ firewall-cmd --zone=public --permanent --add-service=https
 firewall-cmd --zone=public --permanent --add-service=postgresql
 ```
 
+### Can't connect to Insight Server, because TLS1.2 is not available
+If you open the browser on the Tableau Server machine and try to connect to the https://<insight-server-ip-or-name> and it fails with complaining about TLS1.2, you need to modify `/etc/nginx/conf.d/palette-insight-server.conf` and change the `ssl_protocols` and `ssl_ciphers` keys to the following:
+```
+    ssl_protocols  TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4;
+```
+
+And then reload the nginx service by
+```bash
+sudo service nginx reload
+```
